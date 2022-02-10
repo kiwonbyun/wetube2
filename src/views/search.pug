@@ -1,0 +1,9 @@
+extends base
+include mixins/video.pug
+
+block content 
+    form(method="GET")
+        input(placeholder="Search by title", type="text", name="keyword")
+        input(type="submit" value="Search now")
+    each video in videos
+        +video(video)
