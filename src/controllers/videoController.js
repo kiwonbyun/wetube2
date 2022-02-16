@@ -1,4 +1,5 @@
 import Video from "../models/Video";
+import User from "../models/User";
 
 export const home = async (req, res) => {
   const videos = await Video.find({}).sort({ createdAt: "desc" });
@@ -7,7 +8,7 @@ export const home = async (req, res) => {
 
 export const watch = async (req, res) => {
   const { id } = req.params;
-  const video = await Video.findById(id);
+  const video = await Video.findById(id).populate("owner");
   if (video === null) {
     return res.status(404).render("404", { pageTitle: "Video not found" });
   }
@@ -20,6 +21,9 @@ export const getEdit = async (req, res) => {
   if (video === null) {
     return res.status(404).render("404", { pageTitle: "Video not found" });
   }
+  if (String(video.owner) !== String(req.session.user._id)) {
+    return res.status(403).redirect("/");
+  }
   return res.render("edit", { pageTitle: `Editing: ${video.title}`, video });
 };
 
@@ -29,6 +33,9 @@ export const postEdit = async (req, res) => {
   const video = await Video.findById(id);
   if (video === null) {
     return res.render("404", { pageTitle: "Video not found" });
+  }
+  if (String(video.owner) !== String(req.session.user._id)) {
+    return res.status(403).redirect("/");
   }
   await Video.findByIdAndUpdate(id, {
     title,
@@ -43,14 +50,22 @@ export const getUpload = (req, res) => {
 };
 
 export const postUpload = async (req, res) => {
+  const {
+    user: { _id },
+  } = req.session;
+  const { file } = req;
   const { title, description, hashtags } = req.body;
   try {
-    const video = new Video({
+    const newVideo = await Video.create({
       title,
+      fileUrl: file.path,
       description,
+      owner: _id,
       hashtags: Video.formatHashtags(hashtags),
     });
-    await video.save();
+    const user = await User.findById(_id);
+    user.videos.push(newVideo._id);
+    user.save();
     return res.redirect("/");
   } catch (error) {
     return res.status(400).render("upload", {
@@ -62,7 +77,10 @@ export const postUpload = async (req, res) => {
 
 export const deleteVideo = async (req, res) => {
   const { id } = req.params;
-  console.log(id);
+  const video = await Video.findById(id);
+  if (String(video.owner) !== String(req.session.user._id)) {
+    return res.status(403).redirect("/");
+  }
   await Video.findByIdAndDelete(id);
   return res.redirect("/");
 };
