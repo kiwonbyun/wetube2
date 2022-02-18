@@ -1,6 +1,12 @@
 extends base
 include mixins/video.pug
 
-block content 
-    each video in user.videos
-        +video(video)
+block content
+    div.profile__data 
+        img(src=`/${user.avatarUrl}`).avatar
+        h3=user.name
+    div.video-grid
+        each video in user.videos
+            +video(video)
+        else 
+            span.empty__message Sorry, No videos found.
