@@ -9,14 +9,16 @@ export const protectorMiddleware = (req, res, next) => {
   if (req.session.loggedIn) {
     next();
   } else {
+    req.flash("error", "로그인이 필요한 서비스입니다.");
     return res.redirect("/login");
   }
 };
 export const publicOnlyMiddleware = (req, res, next) => {
-  if (req.session.loggedIn) {
-    return res.redirect("/");
-  } else {
+  if (!req.session.loggedIn) {
     next();
+  } else {
+    req.flash("error", "Not authorized");
+    return res.redirect("/");
   }
 };
 export const avatarUpload = multer({

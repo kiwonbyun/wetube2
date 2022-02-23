@@ -50,9 +50,9 @@ export const postLogin = async (req, res) => {
   }
   const ok = await bcrypt.compare(password, user.password);
   if (!ok) {
+    req.flash("error", "비밀번호가 틀렸습니다.");
     return res.status(400).render("login", {
       pageTitle: "Log in",
-      errorMessage: "비밀번호가 틀렸습니다.",
     });
   }
   req.session.loggedIn = true;
@@ -135,7 +135,10 @@ export const finishGithubLogin = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-  req.session.destroy();
+  req.session.user = null;
+  res.locals.loggedInUser = req.session.user;
+  req.session.loggedIn = false;
+  req.flash("info", "다음에 다시 찾아주세요:)");
   return res.redirect("/");
 };
 
@@ -162,6 +165,10 @@ export const postEdit = async (req, res) => {
   return res.redirect("/users/edit");
 };
 export const getChangePassword = (req, res) => {
+  if (req.session.user.socialOnly === true) {
+    req.flash("error", "소셜로그인 사용자는 변경할 수 없습니다.");
+    return res.redirect("/");
+  }
   return res.render("change-password", { pageTitle: "Change Password" });
 };
 export const postChangePassword = async (req, res) => {
@@ -183,7 +190,8 @@ export const postChangePassword = async (req, res) => {
   }
   user.password = newPassword;
   await user.save();
-  return res.redirect("/users/logout");
+  req.flash("info", "비밀번호가 성공적으로 변경되었습니다.");
+  return res.redirect("/users/edit");
 };
 export const see = async (req, res) => {
   const { id } = req.params;

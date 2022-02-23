@@ -1,0 +1,48 @@
+.videowatch-meta {
+  .titleline {
+    opacity: 0.3;
+  }
+  h2 {
+    font-size: 60px;
+    margin: 20px 5px;
+  }
+  p {
+    font-size: 25px;
+    margin-bottom: 20px;
+    margin-left: 5px;
+  }
+  small {
+    font-size: 18px;
+    margin-bottom: 20px;
+    margin-left: 5px;
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+.videowatch-creator {
+  margin-left: 5px;
+  margin-bottom: 10px;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.7);
+}
+.videoEditBtn {
+  right: 130px;
+  bottom: 20px;
+  a {
+    display: block;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+.video__comments {
+  display: flex;
+  flex-direction: column;
+  max-width: 700px;
+  margin: 0 auto;
+  .video__comment {
+    background-color: aliceblue;
+    color: black;
+    margin-top: 10px;
+    padding: 5px 10px;
+    border-radius: 999px;
+  }
+}

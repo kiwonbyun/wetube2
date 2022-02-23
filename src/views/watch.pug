@@ -19,18 +19,34 @@ block content
             div
                 span#fullScreen
                     i.fas.fa-expand
-    //-
-        div
-            p=video.description
-            small=video.createdAt
-        div
-            small Uploaded by 
-                a(href=`/users/${video.owner._id}`)=video.owner.name
+    
+    div.videowatch-meta
+        h2=video.title
+        hr.titleline
+        p=video.description
+        small=video.createdAt
+    div.videowatch-creator
+        small Uploaded by 
+            a(href=`/users/${video.owner._id}`)=video.owner.name
         if String(video.owner._id) === String(loggedInUser._id)
-            a(href=`${video.id}/edit`) Edit Video &rarr;
-            br
-            a(href=`${video.id}/delete`) Delete Video &rarr;
-
-
+            div.videoEditBtn
+                a(href=`${video.id}/edit`) Edit Video &rarr;
+                br
+                a(href=`${video.id}/delete`) Delete Video &rarr;
+    if loggedIn
+        div.video__add-comments
+            form.video__comments-form#commentForm
+                textarea(cols="30", rows="10", placeholder="선한 영향력의 댓글을 달아주세요:)")
+                button 댓글
+        div.video__comments
+            ul 
+                each comment in video.comments.reverse()
+                    li.video__comment(data-id=comment._id)
+                        i.fas.fa-comment
+                        span  #{comment.text}
+                        if String(loggedInUser._id) === String(comment.owner._id)
+                            span#deleteBtn ❌
 block scripts
-    script(src="/static/js/videoPlayer.js") 
+    script(src="/static/js/videoPlayer.js")
+    if loggedIn
+        script(src="/static/js/commentSection.js") 
